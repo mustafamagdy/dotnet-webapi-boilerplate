@@ -1,7 +1,44 @@
 ﻿using Finbuckle.MultiTenant;
 using FSH.WebApi.Shared.Multitenancy;
+using MassTransit;
 
 namespace FSH.WebApi.Infrastructure.Multitenancy;
+
+public class TenantSubscriptionInfo
+{
+    public string Id { get; set; }
+    public string TenantId { get; set; }
+    public DateTime ExpiryDate { get; private set; }
+    public bool IsDemo { get; private set; }
+
+    public TenantSubscriptionInfo Renew(DateTime newExpiryDate)
+    {
+        ExpiryDate = newExpiryDate;
+        return this;
+    }
+
+    public static TenantSubscriptionInfo CreateDemoForDays(string tenantId, int days)
+    {
+        return new TenantSubscriptionInfo
+        {
+            Id = NewId.Next().ToString(),
+            TenantId = tenantId,
+            ExpiryDate = DateTime.Now.AddDays(days),
+            IsDemo = true
+        };
+    }
+
+    public static TenantSubscriptionInfo CreateProdForDays(string tenantId, int days)
+    {
+        return new TenantSubscriptionInfo
+        {
+            Id = NewId.Next().ToString(),
+            TenantId = tenantId,
+            ExpiryDate = DateTime.Now.AddDays(days),
+            IsDemo = false
+        };
+    }
+}
 
 public class FSHTenantInfo : ITenantInfo
 {
@@ -18,9 +55,6 @@ public class FSHTenantInfo : ITenantInfo
         AdminEmail = adminEmail;
         IsActive = true;
         Issuer = issuer;
-
-        // Add Default 1 Month Validity for all new tenants. Something like a DEMO period for tenants.
-        ValidUpto = DateTime.UtcNow.AddMonths(1);
     }
 
     /// <summary>
@@ -44,6 +78,8 @@ public class FSHTenantInfo : ITenantInfo
     /// Used by AzureAd Authorization to store the AzureAd Tenant Issuer to map against.
     /// </summary>
     public string? Issuer { get; set; }
+
+    public string? Key => Name?.ToLower().Replace(" ", "-");
 
     public void AddValidity(int months) =>
         ValidUpto = ValidUpto.AddMonths(months);
@@ -73,8 +109,27 @@ public class FSHTenantInfo : ITenantInfo
         IsActive = false;
     }
 
-    string? ITenantInfo.Id { get => Id; set => Id = value ?? throw new InvalidOperationException("Id can't be null."); }
-    string? ITenantInfo.Identifier { get => Identifier; set => Identifier = value ?? throw new InvalidOperationException("Identifier can't be null."); }
-    string? ITenantInfo.Name { get => Name; set => Name = value ?? throw new InvalidOperationException("Name can't be null."); }
-    string? ITenantInfo.ConnectionString { get => ConnectionString; set => ConnectionString = value ?? throw new InvalidOperationException("ConnectionString can't be null."); }
+    string? ITenantInfo.Id
+    {
+        get => Id;
+        set => Id = value ?? throw new InvalidOperationException("Id can't be null.");
+    }
+
+    string? ITenantInfo.Identifier
+    {
+        get => Identifier;
+        set => Identifier = value ?? throw new InvalidOperationException("Identifier can't be null.");
+    }
+
+    string? ITenantInfo.Name
+    {
+        get => Name;
+        set => Name = value ?? throw new InvalidOperationException("Name can't be null.");
+    }
+
+    string? ITenantInfo.ConnectionString
+    {
+        get => ConnectionString;
+        set => ConnectionString = value ?? throw new InvalidOperationException("ConnectionString can't be null.");
+    }
 }

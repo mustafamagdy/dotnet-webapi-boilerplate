@@ -1,6 +1,6 @@
 {
   "DatabaseSettings": {
     "DBProvider": "mysql",
-    "ConnectionString": "Data Source=127.0.0.1;Initial Catalog=multi-tenant-01;User Id=root;Password=PAAa123"
+    "ConnectionString": "Data Source=127.0.0.1;Initial Catalog=multi-tenant-01;User Id=root;Password=Dev1234"
   }
 }
