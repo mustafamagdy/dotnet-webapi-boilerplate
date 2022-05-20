@@ -30,20 +30,30 @@ public class TenantsController : VersionNeutralApiController {
   [ApiConventionMethod(typeof(FSHApiConventions), nameof(FSHApiConventions.Register))]
   public Task<string> DeactivateAsync(string id) { return Mediator.Send(new DeactivateTenantRequest(id)); }
 
-  [HttpPost("{id}/upgrade")]
-  [MustHavePermission(FSHAction.UpgradeSubscription, FSHResource.Tenants)]
-  [OpenApiOperation("Upgrade a tenant's subscription.", "")]
-  [ApiConventionMethod(typeof(FSHApiConventions), nameof(FSHApiConventions.Register))]
-  public async Task<ActionResult<string>> UpgradeSubscriptionAsync(string id, UpgradeSubscriptionRequest request) {
-    return id != request.TenantId
-      ? BadRequest()
-      : Ok(await Mediator.Send(request));
-  }
+  // [HttpPost("{id}/upgrade")]
+  // [MustHavePermission(FSHAction.UpgradeSubscription, FSHResource.Tenants)]
+  // [OpenApiOperation("Upgrade a tenant's subscription.", "")]
+  // [ApiConventionMethod(typeof(FSHApiConventions), nameof(FSHApiConventions.Register))]
+  // public async Task<ActionResult<string>> UpgradeSubscriptionAsync(string id, UpgradeSubscriptionRequest request) {
+  //   return id != request.TenantId
+  //     ? BadRequest()
+  //     : Ok(await Mediator.Send(request));
+  // }
 
   [HttpGet("{tenantId}/subscriptions")]
   [MustHavePermission(FSHAction.View, FSHResource.Tenants)]
   [OpenApiOperation("Get a list of active subscriptions for a tenant.", "")]
   public Task<List<TenantSubscriptionDto>> GetActiveSubscriptions(string tenantId) {
     return Mediator.Send(new GetActiveSubscriptionsRequest(tenantId));
+  }
+
+  [HttpPost("{tenantId}/subscription/{subscriptionId}/renew")]
+  [MustHavePermission(FSHAction.View, FSHResource.Tenants)]
+  [OpenApiOperation("Renew subscription for a tenant", "")]
+  public async Task<ActionResult<string>> RenewSubscription(string tenantId, string subscriptionId,
+    RenewSubscriptionRequest request) {
+    return (tenantId != request.TenantId || subscriptionId != request.SubscriptionId)
+      ? BadRequest()
+      : Ok(await Mediator.Send(request));
   }
 }

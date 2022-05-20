@@ -9,6 +9,6 @@ public interface ITenantService
     Task<string> CreateAsync(CreateTenantRequest request, CancellationToken cancellationToken);
     Task<string> ActivateAsync(string id);
     Task<string> DeactivateAsync(string id);
-    Task<string> UpdateSubscription(string id, DateTime extendedExpiryDate);
+    Task<string> RenewSubscription(string subscriptionId, DateTime extendedExpiryDate);
     Task<IEnumerable<TenantSubscriptionDto>> GetActiveSubscriptions(string tenantId);
 }
