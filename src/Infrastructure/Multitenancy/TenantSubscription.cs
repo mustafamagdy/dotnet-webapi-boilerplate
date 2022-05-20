@@ -1,6 +1,6 @@
-namespace FSH.WebApi.Domain.Catalog;
+namespace FSH.WebApi.Infrastructure.Multitenancy;
 
-public class TenantSubscription : AuditableEntity {
+public class TenantSubscription {
   public string Id { get; set; }
   public string TenantId { get; set; }
   public DateTime ExpiryDate { get; set; }

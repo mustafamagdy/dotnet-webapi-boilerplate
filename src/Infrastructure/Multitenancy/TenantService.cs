@@ -16,7 +16,7 @@ namespace FSH.WebApi.Infrastructure.Multitenancy;
 
 internal class TenantService : ITenantService {
   private readonly IMultiTenantStore<FSHTenantInfo> _tenantStore;
-  private readonly ApplicationDbContext _dbContext;
+  private readonly TenantDbContext _tenantDbContext;
   private readonly IConnectionStringSecurer _csSecurer;
   private readonly IDatabaseInitializer _dbInitializer;
   private readonly IJobService _jobService;
@@ -27,7 +27,7 @@ internal class TenantService : ITenantService {
 
   public TenantService(
     IMultiTenantStore<FSHTenantInfo> tenantStore,
-    ApplicationDbContext dbContext,
+    TenantDbContext tenantDbContext,
     IConnectionStringSecurer csSecurer,
     IDatabaseInitializer dbInitializer,
     IJobService jobService,
@@ -36,7 +36,7 @@ internal class TenantService : ITenantService {
     IStringLocalizer<TenantService> localizer,
     IOptions<DatabaseSettings> dbSettings) {
     _tenantStore = tenantStore;
-    _dbContext = dbContext;
+    _tenantDbContext = tenantDbContext;
     _csSecurer = csSecurer;
     _dbInitializer = dbInitializer;
     _jobService = jobService;
@@ -139,7 +139,7 @@ internal class TenantService : ITenantService {
   }
 
   public async Task<IEnumerable<TenantSubscriptionDto>> GetActiveSubscriptions(string tenantId) {
-    var subscription = (await _dbContext.TenantSubscriptions
+    var subscription = (await _tenantDbContext.Set<TenantSubscription>()
       .Where(a => a.TenantId == tenantId && a.ExpiryDate > DateTime.Now)
       .ToListAsync()).Adapt<List<TenantSubscriptionDto>>();
 
