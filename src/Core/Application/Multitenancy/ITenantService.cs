@@ -10,4 +10,5 @@ public interface ITenantService
     Task<string> ActivateAsync(string id);
     Task<string> DeactivateAsync(string id);
     Task<string> UpdateSubscription(string id, DateTime extendedExpiryDate);
+    Task<IEnumerable<TenantSubscriptionDto>> GetActiveSubscriptions(string tenantId);
 }
