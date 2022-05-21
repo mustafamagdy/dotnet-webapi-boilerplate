@@ -31,19 +31,13 @@
     "WriteTo": [
       {
         "Args": {
-          "path": "Logs/logs.json",
+          "path": "Logs/logs_.json",
           "formatter": "Serilog.Formatting.Json.JsonFormatter, Serilog",
           "rollingInterval": "Day",
           "restrictedToMinimumLevel": "Information",
-          "retainedFileCountLimit": 5
+          "retainedFileCountLimit": 365
         },
         "Name": "File"
-      },
-      {
-        "Name": "Seq",
-        "Args": {
-          "serverUrl": "http://localhost:5341"
-        }
       },
       {
         "Name": "Hangfire"
@@ -55,7 +49,7 @@
           "indexFormat": "FSH.WebApi-logs-{0:yyyy.MM}",
           "numberOfShards": 2,
           "numberOfReplicas": 1,
-          "restrictedToMinimumLevel": "Information"
+          "restrictedToMinimumLevel": "Debug"
         }
       }
     ]
