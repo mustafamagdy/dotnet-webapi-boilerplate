@@ -15,7 +15,7 @@ public class ResponseLoggingMiddleware : IMiddleware
     {
         await next(httpContext);
         var originalBody = httpContext.Response.Body;
-        using var newBody = new MemoryStream();
+        await using var newBody = new MemoryStream();
         httpContext.Response.Body = newBody;
         string responseBody;
         if (httpContext.Request.Path.ToString().Contains("tokens"))
@@ -38,7 +38,7 @@ public class ResponseLoggingMiddleware : IMiddleware
         LogContext.PushProperty("ResponseTimeUTC", DateTime.UtcNow);
         Log.ForContext("ResponseHeaders", httpContext.Response.Headers.ToDictionary(h => h.Key, h => h.Value.ToString()), destructureObjects: true)
        .ForContext("ResponseBody", responseBody)
-       .Information("HTTP {RequestMethod} Request to {RequestPath} by {RequesterEmail} has Status Code {StatusCode}.", httpContext.Request.Method, httpContext.Request.Path, string.IsNullOrEmpty(email) ? "Anonymous" : email, httpContext.Response.StatusCode);
+       .Information("HTTP {RequestMethod} Request to {RequestPath} by {RequesterEmail} has Status Code {StatusCode}", httpContext.Request.Method, httpContext.Request.Path, string.IsNullOrEmpty(email) ? "Anonymous" : email, httpContext.Response.StatusCode);
         newBody.Seek(0, SeekOrigin.Begin);
         await newBody.CopyToAsync(originalBody);
     }
