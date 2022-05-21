@@ -42,8 +42,7 @@ internal class TokenService : ITokenService
     _securitySettings = securitySettings.Value;
   }
 
-  public async Task<TokenResponse> GetTokenAsync(TokenRequest request, string ipAddress,
-    CancellationToken cancellationToken)
+  public async Task<TokenResponse> GetTokenAsync(TokenRequest request, string ipAddress, CancellationToken cancellationToken)
   {
     if (string.IsNullOrWhiteSpace(_currentTenant?.Id)
         || await _userManager.FindByEmailAsync(request.Email.Trim().Normalize()) is not { } user
@@ -69,7 +68,7 @@ internal class TokenService : ITokenService
         throw new UnauthorizedException(_t["Tenant is not Active. Please contact the Application Administrator."]);
       }
 
-      if (!(await HasAValidSubscription(_currentTenant.Id)))
+      if (_securitySettings.RequireActiveTenantSubscription && !(await HasAValidSubscription(_currentTenant.Id)))
       {
         throw new UnauthorizedException(
           _t["Tenant has no valid subscription. Please contact the Application Administrator."]);

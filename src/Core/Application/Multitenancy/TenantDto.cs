@@ -8,4 +8,6 @@ public class TenantDto
   public string AdminEmail { get; set; } = default!;
   public bool IsActive { get; set; }
   public string? Issuer { get; set; }
+
+  public List<TenantSubscriptionDto> ActiveSubscriptions { get; set; }
 }

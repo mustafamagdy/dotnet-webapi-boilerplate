@@ -1,4 +1,5 @@
-﻿using Finbuckle.MultiTenant;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using Finbuckle.MultiTenant;
 using FSH.WebApi.Shared.Multitenancy;
 using MassTransit;
 
@@ -42,7 +43,9 @@ public class TenantSubscriptionInfo
 
 public class FSHTenantInfo : ITenantInfo
 {
-  public FSHTenantInfo() { }
+  public FSHTenantInfo()
+  {
+  }
 
   public FSHTenantInfo(string id, string name, string? connectionString, string adminEmail, string? issuer = null)
   {
@@ -70,7 +73,9 @@ public class FSHTenantInfo : ITenantInfo
 
   public string AdminEmail { get; private set; } = default!;
   public bool IsActive { get; private set; }
-  public DateTime ValidUpto { get; private set; }
+
+  [NotMapped]
+  public List<TenantSubscription> ActiveSubscriptions { get; private set; }
 
   /// <summary>
   /// Used by AzureAd Authorization to store the AzureAd Tenant Issuer to map against.
@@ -78,11 +83,6 @@ public class FSHTenantInfo : ITenantInfo
   public string? Issuer { get; set; }
 
   public string? Key => Name?.ToLower().Replace(" ", "-");
-
-  public void SetValidity(in DateTime validTill) =>
-    ValidUpto = ValidUpto < validTill
-      ? validTill
-      : throw new Exception("Subscription cannot be backdated.");
 
   public void Activate()
   {
@@ -104,20 +104,17 @@ public class FSHTenantInfo : ITenantInfo
     IsActive = false;
   }
 
+  public FSHTenantInfo SetActiveSubscriptions(List<TenantSubscription> activeSubscriptions)
+  {
+    ActiveSubscriptions = activeSubscriptions;
+    return this;
+  }
+
   string? ITenantInfo.Id { get => Id; set => Id = value ?? throw new InvalidOperationException("Id can't be null."); }
 
-  string? ITenantInfo.Identifier {
-    get => Identifier;
-    set => Identifier = value ?? throw new InvalidOperationException("Identifier can't be null.");
-  }
+  string? ITenantInfo.Identifier { get => Identifier; set => Identifier = value ?? throw new InvalidOperationException("Identifier can't be null."); }
 
-  string? ITenantInfo.Name {
-    get => Name;
-    set => Name = value ?? throw new InvalidOperationException("Name can't be null.");
-  }
+  string? ITenantInfo.Name { get => Name; set => Name = value ?? throw new InvalidOperationException("Name can't be null."); }
 
-  string? ITenantInfo.ConnectionString {
-    get => ConnectionString;
-    set => ConnectionString = value ?? throw new InvalidOperationException("ConnectionString can't be null.");
-  }
+  string? ITenantInfo.ConnectionString { get => ConnectionString; set => ConnectionString = value ?? throw new InvalidOperationException("ConnectionString can't be null."); }
 }

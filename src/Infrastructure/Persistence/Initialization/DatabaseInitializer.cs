@@ -52,9 +52,9 @@ internal class DatabaseInitializer : IDatabaseInitializer
 
     private async Task InitializeTenantDbAsync(CancellationToken cancellationToken)
     {
-        if (_tenantDbContext.Database.GetPendingMigrations().Any())
+        if ((await _tenantDbContext.Database.GetPendingMigrationsAsync(cancellationToken)).Any())
         {
-            _logger.LogInformation("Applying Root Migrations.");
+            _logger.LogInformation("Applying Root Migrations");
             await _tenantDbContext.Database.MigrateAsync(cancellationToken);
         }
 
@@ -70,8 +70,6 @@ internal class DatabaseInitializer : IDatabaseInitializer
                 MultitenancyConstants.Root.Name,
                 string.Empty,
                 MultitenancyConstants.Root.EmailAddress);
-
-            rootTenant.SetValidity(DateTime.UtcNow.AddYears(1));
 
             _tenantDbContext.TenantInfo.Add(rootTenant);
 

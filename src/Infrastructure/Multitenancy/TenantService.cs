@@ -62,9 +62,11 @@ internal class TenantService : ITenantService
   public async Task<bool> ExistsWithNameAsync(string name) =>
     (await _tenantStore.GetAllAsync()).Any(t => t.Name == name);
 
-  public async Task<TenantDto> GetByIdAsync(string id) =>
-    (await GetTenantInfoAsync(id))
-    .Adapt<TenantDto>();
+  public async Task<TenantDto> GetByIdAsync(string id)
+  {
+    var tenant = await GetTenantInfoAsync(id);
+    return tenant.Adapt<TenantDto>();
+  }
 
   public async Task<string> CreateAsync(CreateTenantRequest request, CancellationToken cancellationToken)
   {
@@ -194,7 +196,16 @@ internal class TenantService : ITenantService
     return subscription;
   }
 
-  private async Task<FSHTenantInfo> GetTenantInfoAsync(string id) =>
-    await _tenantStore.TryGetAsync(id)
-    ?? throw new NotFoundException(_t["{0} {1} Not Found.", typeof(FSHTenantInfo).Name, id]);
+  private async Task<FSHTenantInfo> GetTenantInfoAsync(string id)
+  {
+    var tenant = await _tenantStore.TryGetAsync(id)
+                 ?? throw new NotFoundException(_t["{0} {1} Not Found.", nameof(FSHTenantInfo), id]);
+
+    var activeSubscriptions = await _tenantDbContext
+      .Set<TenantSubscription>()
+      .Where(a => a.TenantId == tenant.Id && a.ExpiryDate >= DateTime.Now)
+      .ToListAsync();
+
+    return activeSubscriptions.Count > 0 ? tenant.SetActiveSubscriptions(activeSubscriptions) : tenant;
+  }
 }
