@@ -12,12 +12,13 @@ public static class FSHAction
     public const string Export = nameof(Export);
     public const string Generate = nameof(Generate);
     public const string Clean = nameof(Clean);
-    public const string UpgradeSubscription = nameof(UpgradeSubscription);
+    // public const string UpgradeSubscription = nameof(UpgradeSubscription);
 }
 
 public static class FSHResource
 {
     public const string Tenants = nameof(Tenants);
+    public const string Subscriptions = nameof(Subscriptions);
     public const string Dashboard = nameof(Dashboard);
     public const string Hangfire = nameof(Hangfire);
     public const string Users = nameof(Users);
@@ -64,7 +65,8 @@ public static class FSHPermissions
         new("View Tenants", FSHAction.View, FSHResource.Tenants, IsRoot: true),
         new("Create Tenants", FSHAction.Create, FSHResource.Tenants, IsRoot: true),
         new("Update Tenants", FSHAction.Update, FSHResource.Tenants, IsRoot: true),
-        new("Upgrade Tenant Subscription", FSHAction.UpgradeSubscription, FSHResource.Tenants, IsRoot: true)
+        new("Create Tenant Subscription", FSHAction.Create, FSHResource.Subscriptions, IsRoot: true),
+        new("Renew Tenant Subscription", FSHAction.Update, FSHResource.Subscriptions, IsRoot: true)
     };
 
     public static IReadOnlyList<FSHPermission> All { get; } = new ReadOnlyCollection<FSHPermission>(_all);

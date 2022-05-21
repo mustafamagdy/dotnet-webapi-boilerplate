@@ -142,7 +142,7 @@ internal class TenantService : ITenantService
       .ToArrayAsync();
 
     var newExpiryDate = DateTime.Now.AddMonths(1);
-    if (subscriptions.Any())
+    if (subscriptions.Length > 0)
     {
       var activeSubscription = subscriptions.First();
       activeSubscription.ExpiryDate = newExpiryDate;
