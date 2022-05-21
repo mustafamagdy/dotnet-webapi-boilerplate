@@ -9,33 +9,32 @@ namespace FSH.WebApi.Infrastructure.Localization;
 
 internal static class Startup
 {
-    internal static IServiceCollection AddPOLocalization(this IServiceCollection services, IConfiguration config)
+  internal static IServiceCollection AddPOLocalization(this IServiceCollection services, IConfiguration config)
+  {
+    var localizationSettings = config.GetSection(nameof(LocalizationSettings)).Get<LocalizationSettings>();
+
+    if (localizationSettings?.EnableLocalization is true && localizationSettings.ResourcesPath is not null)
     {
-        var localizationSettings = config.GetSection(nameof(LocalizationSettings)).Get<LocalizationSettings>();
+      services.AddPortableObjectLocalization(options => options.ResourcesPath = localizationSettings.ResourcesPath);
 
-        if (localizationSettings?.EnableLocalization is true
-            && localizationSettings.ResourcesPath is not null)
+      services.Configure<RequestLocalizationOptions>(options =>
+      {
+        if (localizationSettings.SupportedCultures != null)
         {
-            services.AddPortableObjectLocalization(options => options.ResourcesPath = localizationSettings.ResourcesPath);
+          var supportedCultures = localizationSettings.SupportedCultures.Select(x => new CultureInfo(x)).ToList();
 
-            services.Configure<RequestLocalizationOptions>(options =>
-            {
-                if (localizationSettings.SupportedCultures != null)
-                {
-                    var supportedCultures = localizationSettings.SupportedCultures.Select(x => new CultureInfo(x)).ToList();
-
-                    options.SupportedCultures = supportedCultures;
-                    options.SupportedUICultures = supportedCultures;
-                }
-
-                options.DefaultRequestCulture = new RequestCulture(localizationSettings.DefaultRequestCulture ?? "en-US");
-                options.FallBackToParentCultures = localizationSettings.FallbackToParent ?? true;
-                options.FallBackToParentUICultures = localizationSettings.FallbackToParent ?? true;
-            });
-
-            services.AddSingleton<ILocalizationFileLocationProvider, FSHPoFileLocationProvider>();
+          options.SupportedCultures = supportedCultures;
+          options.SupportedUICultures = supportedCultures;
         }
 
-        return services;
+        options.DefaultRequestCulture = new RequestCulture(localizationSettings.DefaultRequestCulture ?? "en-US");
+        options.FallBackToParentCultures = localizationSettings.FallbackToParent ?? true;
+        options.FallBackToParentUICultures = localizationSettings.FallbackToParent ?? true;
+      });
+
+      services.AddSingleton<ILocalizationFileLocationProvider, FSHPoFileLocationProvider>();
     }
+
+    return services;
+  }
 }

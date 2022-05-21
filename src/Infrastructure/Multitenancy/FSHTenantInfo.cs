@@ -4,19 +4,23 @@ using MassTransit;
 
 namespace FSH.WebApi.Infrastructure.Multitenancy;
 
-public class TenantSubscriptionInfo {
+public class TenantSubscriptionInfo
+{
   public string Id { get; set; }
   public string TenantId { get; set; }
   public DateTime ExpiryDate { get; private set; }
   public bool IsDemo { get; private set; }
 
-  public TenantSubscriptionInfo Renew(DateTime newExpiryDate) {
+  public TenantSubscriptionInfo Renew(DateTime newExpiryDate)
+  {
     ExpiryDate = newExpiryDate;
     return this;
   }
 
-  public static TenantSubscriptionInfo CreateDemoForDays(string tenantId, int days) {
-    return new TenantSubscriptionInfo {
+  public static TenantSubscriptionInfo CreateDemoForDays(string tenantId, int days)
+  {
+    return new TenantSubscriptionInfo
+    {
       Id = NewId.Next().ToString(),
       TenantId = tenantId,
       ExpiryDate = DateTime.Now.AddDays(days),
@@ -24,8 +28,10 @@ public class TenantSubscriptionInfo {
     };
   }
 
-  public static TenantSubscriptionInfo CreateProdForDays(string tenantId, int days) {
-    return new TenantSubscriptionInfo {
+  public static TenantSubscriptionInfo CreateProdForDays(string tenantId, int days)
+  {
+    return new TenantSubscriptionInfo
+    {
       Id = NewId.Next().ToString(),
       TenantId = tenantId,
       ExpiryDate = DateTime.Now.AddDays(days),
@@ -34,10 +40,12 @@ public class TenantSubscriptionInfo {
   }
 }
 
-public class FSHTenantInfo : ITenantInfo {
+public class FSHTenantInfo : ITenantInfo
+{
   public FSHTenantInfo() { }
 
-  public FSHTenantInfo(string id, string name, string? connectionString, string adminEmail, string? issuer = null) {
+  public FSHTenantInfo(string id, string name, string? connectionString, string adminEmail, string? issuer = null)
+  {
     Id = id;
     Identifier = id;
     Name = name;
@@ -76,16 +84,20 @@ public class FSHTenantInfo : ITenantInfo {
       ? validTill
       : throw new Exception("Subscription cannot be backdated.");
 
-  public void Activate() {
-    if (Id == MultitenancyConstants.Root.Id) {
+  public void Activate()
+  {
+    if (Id == MultitenancyConstants.Root.Id)
+    {
       throw new InvalidOperationException("Invalid Tenant");
     }
 
     IsActive = true;
   }
 
-  public void Deactivate() {
-    if (Id == MultitenancyConstants.Root.Id) {
+  public void Deactivate()
+  {
+    if (Id == MultitenancyConstants.Root.Id)
+    {
       throw new InvalidOperationException("Invalid Tenant");
     }
 
@@ -108,5 +120,4 @@ public class FSHTenantInfo : ITenantInfo {
     get => ConnectionString;
     set => ConnectionString = value ?? throw new InvalidOperationException("ConnectionString can't be null.");
   }
-
 }

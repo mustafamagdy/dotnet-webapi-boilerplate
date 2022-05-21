@@ -27,8 +27,10 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace FSH.WebApi.Infrastructure;
 
-public static class Startup {
-  public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration config) {
+public static class Startup
+{
+  public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration config)
+  {
     MapsterSettings.Configure();
     return services
       .AddApiVersioning()
@@ -51,7 +53,8 @@ public static class Startup {
   }
 
   private static IServiceCollection AddApiVersioning(this IServiceCollection services) =>
-    services.AddApiVersioning(config => {
+    services.AddApiVersioning(config =>
+    {
       config.DefaultApiVersion = new ApiVersion(1, 0);
       config.AssumeDefaultVersionWhenUnspecified = true;
       config.ReportApiVersions = true;
@@ -61,7 +64,8 @@ public static class Startup {
     services.AddHealthChecks().AddCheck<TenantHealthCheck>("Tenant").Services;
 
   public static async Task InitializeDatabasesAsync(this IServiceProvider services,
-    CancellationToken cancellationToken = default) {
+    CancellationToken cancellationToken = default)
+  {
     // Create a new scope to retrieve scoped services
     using var scope = services.CreateScope();
 
@@ -86,7 +90,8 @@ public static class Startup {
       .UseHangfireDashboard(config)
       .UseOpenApiDocumentation(config);
 
-  public static IEndpointRouteBuilder MapEndpoints(this IEndpointRouteBuilder builder) {
+  public static IEndpointRouteBuilder MapEndpoints(this IEndpointRouteBuilder builder)
+  {
     builder.MapControllers().RequireAuthorization();
     builder.MapHealthCheck();
     builder.MapNotifications();

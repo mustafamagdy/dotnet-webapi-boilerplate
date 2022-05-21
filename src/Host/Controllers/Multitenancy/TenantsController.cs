@@ -2,7 +2,8 @@ using FSH.WebApi.Application.Multitenancy;
 
 namespace FSH.WebApi.Host.Controllers.Multitenancy;
 
-public class TenantsController : VersionNeutralApiController {
+public class TenantsController : VersionNeutralApiController
+{
   [HttpGet]
   [MustHavePermission(FSHAction.View, FSHResource.Tenants)]
   [OpenApiOperation("Get a list of all tenants.", "")]
@@ -43,7 +44,8 @@ public class TenantsController : VersionNeutralApiController {
   [HttpGet("{tenantId}/subscriptions")]
   [MustHavePermission(FSHAction.View, FSHResource.Tenants)]
   [OpenApiOperation("Get a list of active subscriptions for a tenant.", "")]
-  public Task<List<TenantSubscriptionDto>> GetActiveSubscriptions(string tenantId) {
+  public Task<List<TenantSubscriptionDto>> GetActiveSubscriptions(string tenantId)
+  {
     return Mediator.Send(new GetActiveSubscriptionsRequest(tenantId));
   }
 
@@ -51,7 +53,8 @@ public class TenantsController : VersionNeutralApiController {
   [MustHavePermission(FSHAction.View, FSHResource.Tenants)]
   [OpenApiOperation("Renew subscription for a tenant", "")]
   public async Task<ActionResult<string>> RenewSubscription(string tenantId, string subscriptionId,
-    RenewSubscriptionRequest request) {
+    RenewSubscriptionRequest request)
+  {
     return (tenantId != request.TenantId || subscriptionId != request.SubscriptionId)
       ? BadRequest()
       : Ok(await Mediator.Send(request));
