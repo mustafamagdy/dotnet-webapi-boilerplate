@@ -22,7 +22,8 @@
         "Hangfire": "Warning",
         "Microsoft": "Error",
         "Microsoft.Hosting.Lifetime": "Information",
-        "System": "Information"
+        "System": "Information",
+        "Microsoft.EntityFrameworkCore": "Warning"
       }
     },
     "Properties": {

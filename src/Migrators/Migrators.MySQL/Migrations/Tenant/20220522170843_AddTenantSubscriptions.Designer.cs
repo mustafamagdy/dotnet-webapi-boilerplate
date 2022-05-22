@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Migrators.MySQL.Migrations.Tenant
 {
     [DbContext(typeof(TenantDbContext))]
-    [Migration("20220520205144_AddTenantSubscriptions")]
+    [Migration("20220522170843_AddTenantSubscriptions")]
     partial class AddTenantSubscriptions
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -49,9 +49,6 @@ namespace Migrators.MySQL.Migrations.Tenant
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<DateTime>("ValidUpto")
-                        .HasColumnType("datetime(6)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("Identifier")
@@ -62,8 +59,9 @@ namespace Migrators.MySQL.Migrations.Tenant
 
             modelBuilder.Entity("FSH.WebApi.Infrastructure.Multitenancy.TenantSubscription", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("varchar(255)");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
 
                     b.Property<DateTime>("ExpiryDate")
                         .HasColumnType("datetime(6)");

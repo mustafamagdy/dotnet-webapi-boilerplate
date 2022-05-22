@@ -9,13 +9,17 @@ namespace Migrators.MySQL.Migrations.Tenant
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropColumn(
+                name: "ValidUpto",
+                schema: "MultiTenancy",
+                table: "Tenants");
+
             migrationBuilder.CreateTable(
                 name: "Subscriptions",
                 schema: "MultiTenancy",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     TenantId = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     ExpiryDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
@@ -33,6 +37,14 @@ namespace Migrators.MySQL.Migrations.Tenant
             migrationBuilder.DropTable(
                 name: "Subscriptions",
                 schema: "MultiTenancy");
+
+            migrationBuilder.AddColumn<DateTime>(
+                name: "ValidUpto",
+                schema: "MultiTenancy",
+                table: "Tenants",
+                type: "datetime(6)",
+                nullable: false,
+                defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
         }
     }
 }

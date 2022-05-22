@@ -21,7 +21,7 @@
     },
     "Storage": {
       "StorageProvider": "mysql",
-      "ConnectionString": "Data Source=127.0.0.1;Initial Catalog=multi-tenant-01;User Id=root;Password=DeV12345;Allow User Variables=true",
+      "ConnectionString": "Data Source=127.0.0.1;Initial Catalog=multi-tenant-03;User Id=root;Password=DeV12345;Allow User Variables=true",
       "Options": {
         "CommandBatchMaxTimeout": "00:05:00",
         "QueuePollInterval": "00:00:01",

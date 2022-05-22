@@ -57,8 +57,9 @@ namespace Migrators.MySQL.Migrations.Tenant
 
             modelBuilder.Entity("FSH.WebApi.Infrastructure.Multitenancy.TenantSubscription", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("varchar(255)");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
 
                     b.Property<DateTime>("ExpiryDate")
                         .HasColumnType("datetime(6)");
