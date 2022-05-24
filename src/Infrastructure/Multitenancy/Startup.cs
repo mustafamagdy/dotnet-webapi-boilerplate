@@ -1,3 +1,4 @@
+using Finbuckle.MultiTenant;
 using FSH.WebApi.Application.Multitenancy;
 using FSH.WebApi.Infrastructure.Persistence;
 using FSH.WebApi.Shared.Authorization;
@@ -22,6 +23,9 @@ internal static class Startup
       {
         // TODO: We should probably add specific dbprovider/connectionstring setting for the tenantDb with a fallback to the main databasesettings
         var databaseSettings = p.GetRequiredService<IOptions<DatabaseSettings>>().Value;
+        var aa = p.GetRequiredService<IOptions<TenantsDatabases>>().Value;
+        var bb = p.GetRequiredService<ITenantResolver>();
+
         m.UseDatabase(databaseSettings.DBProvider, databaseSettings.ConnectionString);
       })
       .AddMultiTenant<FSHTenantInfo>()

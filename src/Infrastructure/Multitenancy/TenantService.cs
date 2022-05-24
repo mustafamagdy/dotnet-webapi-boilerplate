@@ -101,7 +101,7 @@ internal class TenantService : ITenantService
 
   private void CreateTenantConnectionString(FSHTenantInfo tenant)
   {
-    _csFactory.SaveConnectionString(tenant.Key, "prod", new DatabaseSettings("mysql", "test connection"));
+    _csFactory.SaveConnectionString(tenant.Key, "prod", new DatabaseSettings("mysql", "Data Source=127.0.0.1;Initial Catalog=multi-tenant-03;User Id=root;Password=DeV12345"));
   }
 
   private void SendWelcomeEmail(FSHTenantInfo tenant, CreateTenantRequest request, TenantSubscriptionInfo subscription)
