@@ -20,6 +20,7 @@ namespace Microsoft.Extensions.DependencyInjection
             where T : class, ITenantInfo, new()
         {
             services.AddScoped<ITenantResolver<T>, TenantResolver<T>>();
+            services.AddScoped<ITenantIdResolver, TenantIdResolver>();
             services.AddScoped<ITenantResolver>(sp => (ITenantResolver)sp.GetRequiredService<ITenantResolver<T>>());
 
             services.AddScoped<IMultiTenantContext<T>>(sp => sp.GetRequiredService<IMultiTenantContextAccessor<T>>().MultiTenantContext!);
