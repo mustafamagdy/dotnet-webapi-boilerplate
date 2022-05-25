@@ -47,12 +47,12 @@ public class FSHTenantInfo : ITenantInfo
   {
   }
 
-  public FSHTenantInfo(string id, string name, string? connectionString, string adminEmail, string? issuer = null)
+  public FSHTenantInfo(string id, string name, string? databaseName, string adminEmail, string? issuer = null)
   {
     Id = id;
     Identifier = id;
     Name = name;
-    ConnectionString = connectionString ?? string.Empty;
+    DatabaseName = databaseName ?? string.Empty;
     AdminEmail = adminEmail;
     IsActive = true;
     Issuer = issuer;
@@ -69,7 +69,7 @@ public class FSHTenantInfo : ITenantInfo
   public string Identifier { get; set; } = default!;
 
   public string Name { get; set; } = default!;
-  public string ConnectionString { get; set; } = default!;
+  public string DatabaseName { get; set; } = default!;
 
   public string AdminEmail { get; private set; } = default!;
   public bool IsActive { get; private set; }
@@ -116,5 +116,6 @@ public class FSHTenantInfo : ITenantInfo
 
   string? ITenantInfo.Name { get => Name; set => Name = value ?? throw new InvalidOperationException("Name can't be null."); }
 
-  string? ITenantInfo.ConnectionString { get => ConnectionString; set => ConnectionString = value ?? throw new InvalidOperationException("ConnectionString can't be null."); }
+  string? ITenantInfo.DatabaseName { get => DatabaseName; set => DatabaseName = value ?? throw new InvalidOperationException
+  ("Database Name can't be null."); }
 }

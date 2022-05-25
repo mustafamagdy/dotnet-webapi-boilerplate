@@ -30,13 +30,10 @@ internal static class Startup
       .ValidateDataAnnotations()
       .ValidateOnStart();
 
-    services.Configure<TenantsDatabases>(config.GetSection("Databases"));
-
     return services
-      .AddDbContext<ApplicationDbContext>((p, m) =>
+      .AddDbContext<ApplicationDbContext>((sp, m) =>
       {
-        // TODO: We should probably add specific dbprovider/connectionstring setting for the tenantDb with a fallback to the main databasesettings
-        var databaseSettings = p.GetRequiredService<IOptions<DatabaseSettings>>().Value;
+        var databaseSettings = sp.GetRequiredService<IOptions<DatabaseSettings>>().Value;
         m.UseDatabase(databaseSettings.DBProvider, databaseSettings.ConnectionString);
       })
       .AddTransient<IDatabaseInitializer, DatabaseInitializer>()

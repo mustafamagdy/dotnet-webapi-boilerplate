@@ -34,6 +34,6 @@ namespace Finbuckle.MultiTenant
 
         public string? Identifier { get; set; }
         public string? Name { get; set; }
-        public string? ConnectionString { get; set; }
+        public string? DatabaseName { get; set; }
     }
 }

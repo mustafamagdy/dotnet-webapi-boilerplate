@@ -5,6 +5,7 @@ using FSH.WebApi.Application.Common.Interfaces;
 using FSH.WebApi.Domain.Common.Contracts;
 using FSH.WebApi.Infrastructure.Auditing;
 using FSH.WebApi.Infrastructure.Identity;
+using FSH.WebApi.Infrastructure.Multitenancy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -15,15 +16,17 @@ public abstract class BaseDbContext : MultiTenantIdentityDbContext<ApplicationUs
 {
   protected readonly ICurrentUser _currentUser;
   private readonly ISerializerService _serializer;
+  private readonly ITenantConnectionStringBuilder _csBuilder;
   private readonly DatabaseSettings _dbSettings;
   private readonly IEventPublisher _events;
 
   protected BaseDbContext(ITenantInfo currentTenant, DbContextOptions options, ICurrentUser currentUser,
-    ISerializerService serializer, IOptions<DatabaseSettings> dbSettings, IEventPublisher events)
+    ISerializerService serializer, ITenantConnectionStringBuilder csBuilder, IOptions<DatabaseSettings> dbSettings, IEventPublisher events)
     : base(currentTenant, options)
   {
     _currentUser = currentUser;
     _serializer = serializer;
+    _csBuilder = csBuilder;
     _dbSettings = dbSettings.Value;
     _events = events;
   }
@@ -56,9 +59,10 @@ public abstract class BaseDbContext : MultiTenantIdentityDbContext<ApplicationUs
     // Or uncomment the next line if you want to see them in the console
     // optionsBuilder.LogTo(Console.WriteLine, LogLevel.Information);
 
-    if (!string.IsNullOrWhiteSpace(TenantInfo?.ConnectionString))
+    if (!string.IsNullOrWhiteSpace(TenantInfo?.DatabaseName))
     {
-      optionsBuilder.UseDatabase(_dbSettings.DBProvider, TenantInfo.ConnectionString);
+      string connectionString = _csBuilder.BuildConnectionString(TenantInfo.DatabaseName);
+      optionsBuilder.UseDatabase(_dbSettings.DBProvider, connectionString);
     }
   }
 

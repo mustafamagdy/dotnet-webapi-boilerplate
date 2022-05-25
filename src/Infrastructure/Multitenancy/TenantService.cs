@@ -26,7 +26,7 @@ internal class TenantService : ITenantService
   private readonly IMailService _mailService;
   private readonly IEmailTemplateService _templateService;
   private readonly IStringLocalizer _t;
-  private readonly ITenantConnectionStringFactory _csFactory;
+  private readonly ITenantConnectionStringBuilder _csBuilder;
   private readonly DatabaseSettings _dbSettings;
 
   public TenantService(
@@ -38,7 +38,7 @@ internal class TenantService : ITenantService
     IMailService mailService,
     IEmailTemplateService templateService,
     IStringLocalizer<TenantService> localizer,
-    ITenantConnectionStringFactory csFactory,
+    ITenantConnectionStringBuilder csBuilder,
     IOptions<DatabaseSettings> dbSettings)
   {
     _tenantStore = tenantStore;
@@ -49,14 +49,14 @@ internal class TenantService : ITenantService
     _mailService = mailService;
     _templateService = templateService;
     _t = localizer;
-    _csFactory = csFactory;
+    _csBuilder = csBuilder;
     _dbSettings = dbSettings.Value;
   }
 
   public async Task<List<TenantDto>> GetAllAsync()
   {
     var tenants = (await _tenantStore.GetAllAsync()).Adapt<List<TenantDto>>();
-    tenants.ForEach(t => t.ConnectionString = _csSecurer.MakeSecure(t.ConnectionString));
+    // tenants.ForEach(t => t.DatabaseName = _csSecurer.MakeSecure(t.DatabaseName));
     return tenants;
   }
 
@@ -74,16 +74,12 @@ internal class TenantService : ITenantService
 
   public async Task<string> CreateAsync(CreateTenantRequest request, CancellationToken cancellationToken)
   {
-    if (request.ConnectionString?.Trim() == _dbSettings.ConnectionString.Trim())
-      request.ConnectionString = string.Empty;
-
-    var tenant = new FSHTenantInfo(request.Id, request.Name, request.ConnectionString, request.AdminEmail, request.Issuer);
+    var tenant = new FSHTenantInfo(request.Id, request.Name, request.DatabaseName, request.AdminEmail, request.Issuer);
 
     await _tenantStore.TryAddAsync(tenant);
     var subscription = await TryCreateSubscription(tenant);
     try
     {
-      CreateTenantConnectionString(tenant);
       await _dbInitializer.InitializeApplicationDbForTenantAsync(tenant, cancellationToken);
 
       SendWelcomeEmail(tenant, request, subscription);
@@ -92,16 +88,10 @@ internal class TenantService : ITenantService
     {
       await _tenantStore.TryRemoveAsync(request.Id);
       await TryRemoveSubscriptions(tenant.Id);
-      TryRemoveConnectionString(tenant.Key);
       throw;
     }
 
     return tenant.Id;
-  }
-
-  private void CreateTenantConnectionString(FSHTenantInfo tenant)
-  {
-    _csFactory.SaveConnectionString(tenant.Key, "prod", new DatabaseSettings("mysql", "Data Source=127.0.0.1;Initial Catalog=multi-tenant-03;User Id=root;Password=DeV12345"));
   }
 
   private void SendWelcomeEmail(FSHTenantInfo tenant, CreateTenantRequest request, TenantSubscriptionInfo subscription)
@@ -143,11 +133,6 @@ internal class TenantService : ITenantService
     }
 
     return subscription.Adapt<TenantSubscriptionInfo>();
-  }
-
-  private void TryRemoveConnectionString(string tenantKey)
-  {
-    _csFactory.RemoveConnectionStringsForTenant(tenantKey);
   }
 
   private async Task TryRemoveSubscriptions(string tenantId)
@@ -231,6 +216,9 @@ internal class TenantService : ITenantService
 
     return subscription;
   }
+
+  public async Task<bool> DatabaseExistAsync(string databaseName) =>
+    (await _tenantStore.GetAllAsync()).Any(t => t.DatabaseName == databaseName);
 
   private async Task<FSHTenantInfo> GetTenantInfoAsync(string id)
   {

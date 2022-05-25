@@ -17,9 +17,10 @@ public class CreateTenantRequestValidator : CustomValidator<CreateTenantRequest>
             .MustAsync(async (name, _) => !await tenantService.ExistsWithNameAsync(name!))
                 .WithMessage((_, name) => T["Tenant {0} already exists.", name]);
 
-        RuleFor(t => t.ConnectionString).Cascade(CascadeMode.Stop)
-            .Must((_, cs) => string.IsNullOrWhiteSpace(cs) || connectionStringValidator.TryValidate(cs))
-                .WithMessage(T["Connection string invalid."]);
+        RuleFor(t => t.DatabaseName).Cascade(CascadeMode.Stop)
+            .NotEmpty()
+            .MustAsync(async (cs, _) => !await tenantService.DatabaseExistAsync(cs!))
+                .WithMessage((_, cs) => T["Database {0} already exists.", cs]);
 
         RuleFor(t => t.AdminEmail).Cascade(CascadeMode.Stop)
             .NotEmpty()

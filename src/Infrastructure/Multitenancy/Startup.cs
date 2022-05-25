@@ -31,7 +31,7 @@ internal static class Startup
       .WithEFCoreStore<TenantDbContext, FSHTenantInfo>()
       .Services
       .AddScoped<ITenantService, TenantService>()
-      .AddSingleton<ITenantConnectionStringFactory, TenantConnectionStringFactory>();
+      .AddSingleton<ITenantConnectionStringBuilder, TenantConnectionStringBuilder>();
   }
 
   internal static IApplicationBuilder UseMultiTenancy(this IApplicationBuilder app) =>
